@@ -1,4 +1,4 @@
-package org.raulresende;
+package org.personagens;
 
 import lombok.Getter;
 import lombok.Setter;

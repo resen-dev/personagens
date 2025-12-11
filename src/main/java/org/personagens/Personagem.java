@@ -1,12 +1,12 @@
-package org.raulresende;
+package org.personagens;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.raulresende.habilidades.Habilidades;
+import org.personagens.habilidades.Habilidades;
 
-import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,10 +16,7 @@ public class Personagem extends Atributos implements Habilidades {
 
     private String nome;
 
-    private HabilidadeBase habilidadeQ;
-    private HabilidadeBase habilidadeW;
-    private HabilidadeBase habilidadeE;
-    private HabilidadeBase habilidadeR;
+    private List<HabilidadeBase> habilidades;
 
     public void atacar(Personagem alvo) {
 

@@ -1,34 +1,57 @@
 package org.personagens;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class HabilidadeBase {
 
     private String nome;
     private int dano;
     private int custo;
-    private int cd;
+    private int coolDownTime;
+    private boolean isInCoolDown;
 
-    public void atacar(Personagem alvo) {
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-        int dano = this.getDano() - alvo.getArmadura();
+    public HabilidadeBase(String nome, int dano, int custo, int coolDownTime) {
+        this.nome = nome;
+        this.dano = dano;
+        this.custo = custo;
+        this.coolDownTime = coolDownTime;
+        this.isInCoolDown = false;
+    }
 
-        if(dano > 0) {
+    public void executar(Personagem alvo) {
 
-            alvo.setVida(alvo.getVida() - dano);
+        iniciarCooldown();
 
-            System.out.format("Personagem: %s recebeu %s de dano e ficou com %s de vida.", alvo.getNome(), dano, alvo.getVida());
+        if(alvo.getArmadura() >= this.dano) {
+            System.out.printf("%s defendeu habilidade %s.\n\n", alvo.getNome(), this.getNome());
             return;
         }
 
-        System.out.format("Personagem: %s defendeu", alvo.getNome());
+        alvo.receberDano(this.getDano(alvo));
+    }
 
+    private void iniciarCooldown() {
+
+        this.isInCoolDown = true;
+        System.out.printf("Habilidade %s entrou em cooldown (%ds). ", this.nome, this.coolDownTime);
+
+        scheduler.schedule(() -> {
+            this.isInCoolDown = false;
+            System.out.printf("Habilidade %s saiu do cooldown.\n\n", this.nome);
+        }, this.coolDownTime, TimeUnit.SECONDS);
+    }
+
+
+    private int getDano(Personagem alvo) {
+        return this.dano -  alvo.getArmadura();
     }
 }
